@@ -1,0 +1,42 @@
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgres://humatan:humatan@db:5432/humatan_crm
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: humatan
+      POSTGRES_PASSWORD: humatan
+      POSTGRES_DB: humatan_crm
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U humatan -d humatan_crm"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    # Reserved for future caching / rate limiting (see docs/decisions/ADR-005).
+    # Not consumed by the app yet — included now so the infra shape doesn't
+    # need to change when it is.
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
