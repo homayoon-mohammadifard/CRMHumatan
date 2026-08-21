@@ -4,9 +4,10 @@ A multi-tenant SaaS CRM backend, built with Django + Django REST Framework
 and PostgreSQL, designed as a real-world, production-minded portfolio
 project rather than a tutorial project.
 
-**Current status: Milestone 1 — Project Foundation.** Identity and
-multi-tenant infrastructure only. Customer/Lead/Deal/Activity/Task/Audit
-domain models are not implemented yet — see [Roadmap](#roadmap).
+**Current status: Milestone 2 — Authentication + Tenant Access.** Identity, 
+multi-tenant infrastructure, JWT auth, tenant resolution, and tenant 
+management endpoints complete. Customer/Lead/Deal/Activity/Task/Audit domain 
+models not yet implemented — see [Roadmap](#roadmap).
 
 ## Architecture at a glance
 
@@ -28,8 +29,9 @@ PostgreSQL
 
 Full details: [`ARCHITECTURE.md`](ARCHITECTURE.md) · [`SECURITY.md`](SECURITY.md) · [`docs/decisions/`](docs/decisions/)
 
-## Main features (Milestone 1)
+## Main features (Milestone 1-2)
 
+### Milestone 1
 - Custom, email-based `User` model
 - `Tenant` model (company/organization)
 - `Membership` model linking `User` <-> `Tenant` <-> `Role`, with a
@@ -45,6 +47,30 @@ Full details: [`ARCHITECTURE.md`](ARCHITECTURE.md) · [`SECURITY.md`](SECURITY.m
 - Dockerized local development (Django + PostgreSQL + Redis)
 - CI (GitHub Actions): lint, format check, Django checks, migration-drift
   check, tests
+
+### Milestone 2
+- **JWT authentication** via `djangorestframework-simplejwt`
+  - `POST /api/v1/auth/register/` — signup new company (creates User +
+    Tenant + owner Membership atomically)
+  - `POST /api/v1/auth/login/` — standard email+password → access+refresh
+    tokens
+  - `POST /api/v1/auth/logout/` — blacklist refresh token
+  - `POST /api/v1/auth/token/refresh/` — obtain new access token
+  - `GET /api/v1/auth/me/` — authenticated user's identity + all tenant
+    memberships
+- **Tenant resolution middleware** — cross-validates `X-Tenant-ID` header
+  against user's Membership rows, never trusts client-supplied tenant IDs
+  (spec sections 8, 9)
+- **Tenant management endpoints**
+  - `GET /api/v1/tenants/` — user's memberships across all tenants (with
+    their role in each)
+  - `GET /api/v1/tenants/me/` — current active tenant (read-only)
+  - `PATCH /api/v1/tenants/me/` — tenant owner only; can update tenant name
+- **Basic authorization** (spec section 45 foundation)
+  - `HasActiveTenant` — requires valid tenant resolution
+  - `IsTenantOwner` — requires Owner role in active tenant
+- **60 comprehensive tests** including high-priority tenant-isolation
+  tests (spec section 62)
 
 ## Technology stack
 
@@ -186,8 +212,8 @@ guard exist. See [ADR-003](docs/decisions/ADR-003-role-model-minimal-in-mileston
 
 | Milestone | Scope |
 |---|---|
-| 1 — Project Foundation | ✅ Done — this release |
-| 2 — Authentication + Tenant Access | JWT auth, `TenantResolutionMiddleware`, tenant-isolation foundation tests at the HTTP level |
+| 1 — Project Foundation | ✅ Done |
+| 2 — Authentication + Tenant Access | ✅ Done |
 | 3 — CRM Core | Customer, Contact, Lead, lead conversion |
 | 4 — Sales | Pipeline, Stage, Deal |
 | 5 — Activities & Tasks | Activity, customer timeline, Task |
