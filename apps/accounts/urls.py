@@ -1,10 +1,16 @@
-"""
-Auth endpoints (login, token refresh, logout) land in Milestone 2 (spec
-section 45). Empty router for now so config/api_urls.py has a stable
-include target and doesn't need to change shape when those endpoints are
-added.
-"""
+"""Auth endpoints (spec section 45 / Milestone 2)."""
+
+from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView
+
+from apps.accounts.views import LoginView, LogoutView, MeView, RegisterView
 
 app_name = "accounts"
 
-urlpatterns = []
+urlpatterns = [
+    path("register/", RegisterView.as_view(), name="register"),
+    path("login/", LoginView.as_view(), name="login"),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
+    path("logout/", LogoutView.as_view(), name="logout"),
+    path("me/", MeView.as_view(), name="me"),
+]

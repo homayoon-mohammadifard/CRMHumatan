@@ -1,9 +1,12 @@
-"""
-Tenant-facing endpoints (tenant settings, tenant management) land in a later
-milestone. Empty router for now so config/api_urls.py has a stable include
-target and doesn't need to change shape when those endpoints are added.
-"""
+"""Tenant-facing endpoints (spec section 45 / Milestone 2)."""
+
+from django.urls import path
+
+from apps.tenants.views import CurrentTenantView, TenantListView
 
 app_name = "tenants"
 
-urlpatterns = []
+urlpatterns = [
+    path("", TenantListView.as_view(), name="list"),
+    path("me/", CurrentTenantView.as_view(), name="current"),
+]
