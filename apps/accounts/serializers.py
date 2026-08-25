@@ -9,11 +9,6 @@ from apps.accounts.services import register_user_and_tenant
 
 
 class MembershipSummarySerializer(serializers.ModelSerializer):
-    """A user's membership in one tenant, from the user's point of view —
-    used in /auth/me/ and the login response so the client can present
-    "which of your organizations do you want to work in" without a
-    separate round-trip.
-    """
 
     tenant_id = serializers.IntegerField(source="tenant.id")
     tenant_name = serializers.CharField(source="tenant.name")
@@ -23,14 +18,7 @@ class MembershipSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Membership
-        fields = [
-            "tenant_id",
-            "tenant_name",
-            "tenant_slug",
-            "role",
-            "role_name",
-            "is_active",
-        ]
+        fields = ["tenant_id","tenant_name","tenant_slug","role","role_name","is_active",]
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -38,21 +26,11 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = [
-            "id",
-            "email",
-            "first_name",
-            "last_name",
-            "memberships",
-        ]
+        fields = ["id","email","first_name","last_name","memberships",]
         read_only_fields = fields
 
 
 class RegisterSerializer(serializers.Serializer):
-    """Signup for a brand-new company: creates a User, a new Tenant, and
-    an owner Membership linking them. See
-    apps.accounts.services.register_user_and_tenant.
-    """
 
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, trim_whitespace=False)
@@ -71,13 +49,9 @@ class RegisterSerializer(serializers.Serializer):
         return value
 
     def create(self, validated_data):
-        result = register_user_and_tenant(
-            email=validated_data["email"],
+        result = register_user_and_tenant(email=validated_data["email"],
             password=validated_data["password"],
-            first_name=validated_data.get("first_name", ""),
-            last_name=validated_data.get("last_name", ""),
-            tenant_name=validated_data["tenant_name"],
-        )
+            first_name=validated_data.get("first_name", ""),last_name=validated_data.get("last_name", ""),tenant_name=validated_data["tenant_name"],)
         return result.user
 
     def update(self, instance, validated_data):
@@ -85,15 +59,6 @@ class RegisterSerializer(serializers.Serializer):
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    """Standard SimpleJWT login, with the user's identity and tenant
-    memberships attached to the response — the frontend needs this
-    immediately after login to know which tenant(s) to offer as "active"
-    (see apps.accounts.middleware.TenantResolutionMiddleware for how an
-    active tenant is then selected via the X-Tenant-ID header).
-
-    The JWT payload itself intentionally carries no tenant claim — see
-    the module docstring on TenantResolutionMiddleware for why.
-    """
 
     def validate(self, attrs):
         data = super().validate(attrs)

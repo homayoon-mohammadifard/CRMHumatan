@@ -1,35 +1,19 @@
-"""
-Base Django settings for Humatan CRM.
-
-Shared by development and production. Environment-specific settings live in
-development.py / production.py — never put secrets or environment-specific
-values directly here.
-"""
-
 from datetime import timedelta
 from pathlib import Path
 
 import environ
 
-# ---------------------------------------------------------------------------
-# Paths & environment
-# ---------------------------------------------------------------------------
-
-# config/settings/base.py -> config/settings -> config -> <repo root>
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 env = environ.Env()
 env_file = BASE_DIR / ".env"
 if env_file.exists():
-    environ.Env.read_env(str(env_file))
+    environ.Env.read_env(env_file=str(env_file))
 
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 DEBUG = env.bool("DJANGO_DEBUG", default=False)
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=[])
 
-# ---------------------------------------------------------------------------
-# Applications
-# ---------------------------------------------------------------------------
 
 DJANGO_APPS = [
     "django.contrib.admin",

@@ -32,9 +32,7 @@ class TestTenantResolutionMiddleware:
         assert response.status_code == 200
         assert response.data["id"] == tenant_a.id
 
-    def test_missing_x_tenant_id_header_leaves_tenant_unresolved(
-        self, authed_client
-    ):
+    def test_missing_x_tenant_id_header_leaves_tenant_unresolved(self, authed_client):
         client, _user = authed_client
 
         # No X-Tenant-ID header means request.tenant remains None, so
@@ -43,15 +41,11 @@ class TestTenantResolutionMiddleware:
 
         assert response.status_code == 403
 
-    def test_invalid_tenant_id_leaves_tenant_unresolved(
-        self, authed_client
-    ):
+    def test_invalid_tenant_id_leaves_tenant_unresolved(self, authed_client):
         client, _user = authed_client
 
         # Non-numeric tenant ID.
-        response = client.get(
-            "/api/v1/tenants/me/", HTTP_X_TENANT_ID="not-a-number"
-        )
+        response = client.get("/api/v1/tenants/me/", HTTP_X_TENANT_ID="not-a-number")
 
         assert response.status_code == 403
 
@@ -70,9 +64,7 @@ class TestTenantResolutionMiddleware:
         api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {login_response.data['access']}")
 
         # Trying to access Tenant B should fail with 403 (permission denied).
-        response = api_client.get(
-            "/api/v1/tenants/me/", HTTP_X_TENANT_ID=str(tenant_b.id)
-        )
+        response = api_client.get("/api/v1/tenants/me/", HTTP_X_TENANT_ID=str(tenant_b.id))
 
         assert response.status_code == 403
 
@@ -91,19 +83,13 @@ class TestTenantResolutionMiddleware:
         )
         api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {login_response.data['access']}")
 
-        response = api_client.get(
-            "/api/v1/tenants/me/", HTTP_X_TENANT_ID=str(tenant_a.id)
-        )
+        response = api_client.get("/api/v1/tenants/me/", HTTP_X_TENANT_ID=str(tenant_a.id))
 
         assert response.status_code == 403
 
-    def test_unauthenticated_request_leaves_tenant_unresolved(
-        self, api_client, tenant_a
-    ):
+    def test_unauthenticated_request_leaves_tenant_unresolved(self, api_client, tenant_a):
         # No authentication means the JWT decode fails, so request.tenant
         # and request.membership are both None.
-        response = api_client.get(
-            "/api/v1/tenants/me/", HTTP_X_TENANT_ID=str(tenant_a.id)
-        )
+        response = api_client.get("/api/v1/tenants/me/", HTTP_X_TENANT_ID=str(tenant_a.id))
 
         assert response.status_code == 401
