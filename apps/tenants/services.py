@@ -1,5 +1,3 @@
-"""Service-layer operations for Tenant, per spec section 20 ("use services
-for important business operations such as ... tenant creation")."""
 
 from __future__ import annotations
 
@@ -19,11 +17,5 @@ def _generate_unique_slug(name: str) -> str:
 
 
 def create_tenant(name: str) -> Tenant:
-    """Create a new Tenant with an auto-generated, unique slug.
-
-    Slug collisions (e.g. two companies both named "Acme") are resolved by
-    appending a numeric suffix rather than failing the request — the name
-    field is not required to be unique, only the slug (used in URLs).
-    """
     slug = _generate_unique_slug(name)
     return Tenant.objects.create(name=name, slug=slug)

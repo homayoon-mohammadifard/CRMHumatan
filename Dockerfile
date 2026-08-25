@@ -6,9 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# libpq-dev + gcc are needed to build psycopg from source on some platforms;
-# psycopg[binary] normally avoids this, but keeping build tooling out of the
-# final image is still worth the multi-stage split below.
+
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libpq5 \
     && rm -rf /var/lib/apt/lists/*

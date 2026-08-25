@@ -72,23 +72,13 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
-# ---------------------------------------------------------------------------
-# Database
-# ---------------------------------------------------------------------------
-
 DATABASES = {
     "default": env.db("DATABASE_URL"),
 }
 
-# ---------------------------------------------------------------------------
-# Custom user model
-# ---------------------------------------------------------------------------
 
 AUTH_USER_MODEL = "accounts.User"
 
-# ---------------------------------------------------------------------------
-# Password validation
-# ---------------------------------------------------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -97,26 +87,14 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# ---------------------------------------------------------------------------
-# Internationalization
-# ---------------------------------------------------------------------------
-
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# ---------------------------------------------------------------------------
-# Static files
-# ---------------------------------------------------------------------------
-
 STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# ---------------------------------------------------------------------------
-# Django REST Framework
-# ---------------------------------------------------------------------------
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -137,10 +115,6 @@ REST_FRAMEWORK = {
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
 }
 
-# ---------------------------------------------------------------------------
-# Simple JWT
-# ---------------------------------------------------------------------------
-
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(
         minutes=env.int("ACCESS_TOKEN_LIFETIME_MINUTES", default=15)
@@ -154,10 +128,6 @@ SIMPLE_JWT = {
     "USER_ID_CLAIM": "user_id",
 }
 
-# ---------------------------------------------------------------------------
-# drf-spectacular (OpenAPI docs)
-# ---------------------------------------------------------------------------
-
 SPECTACULAR_SETTINGS = {
     "TITLE": "Humatan CRM API",
     "DESCRIPTION": "Multi-Tenant SaaS CRM backend API.",
@@ -165,9 +135,6 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
-# ---------------------------------------------------------------------------
-# Logging (minimal, environment-specific tuning happens in dev/prod)
-# ---------------------------------------------------------------------------
 
 LOGGING = {
     "version": 1,

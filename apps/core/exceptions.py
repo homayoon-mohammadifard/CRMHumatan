@@ -1,18 +1,3 @@
-"""
-Project-wide DRF exception handler.
-
-Normalizes every DRF error response into a single consistent shape:
-
-    {
-        "detail": "Human readable summary.",
-        "code": "some_error_code",
-        "errors": { "field_name": ["..."], ... }
-    }
-
-so API consumers never need to branch on whether a given endpoint returns a
-plain string, a list, or a nested dict (DRF's default behavior varies by
-exception type).
-"""
 
 from __future__ import annotations
 

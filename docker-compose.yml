@@ -31,9 +31,6 @@ services:
       retries: 5
 
   redis:
-    # Reserved for future caching / rate limiting (see docs/decisions/ADR-005).
-    # Not consumed by the app yet — included now so the infra shape doesn't
-    # need to change when it is.
     image: redis:7-alpine
     ports:
       - "6379:6379"

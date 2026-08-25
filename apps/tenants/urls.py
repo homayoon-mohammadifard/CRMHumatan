@@ -1,4 +1,3 @@
-"""Tenant-facing endpoints (spec section 45 / Milestone 2)."""
 
 from django.urls import path
 

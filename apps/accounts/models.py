@@ -9,14 +9,6 @@ from apps.core.models import TenantOwnedModel, TimeStampedModel
 
 
 class UserManager(BaseUserManager):
-    """Manager for the email-based custom User model.
-
-    Django's default UserManager assumes a `username` field; since Humatan
-    CRM authenticates by email (there is no meaningful "username" concept
-    for a B2B CRM identity), this manager is written from scratch rather
-    than subclassing Django's default.
-    """
-
     use_in_migrations = True
 
     def _create_user(self, email: str, password: str | None, **extra_fields):
@@ -46,20 +38,6 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
-    """Platform-wide identity.
-
-    A User is NOT scoped to a single Tenant. The same person may hold
-    separate Memberships (with different Roles) in more than one Tenant
-    (see spec section 4 / Membership below) — the backend must not assume
-    a 1:1 User<->Tenant relationship even though the first UI may only
-    expose a single active tenant at a time.
-
-    `is_staff` / `is_superuser` (from PermissionsMixin) grant Django-admin
-    / platform-level access — this is the "Platform Superuser" concept
-    (spec section 5A) and is deliberately kept separate from Tenant RBAC
-    (Membership -> Role). Business authorization must never be implemented
-    as `if user.is_staff` / `if user.is_superuser` (spec section 6).
-    """
 
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=150, blank=True)
@@ -88,18 +66,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
 
 
 class Role(TimeStampedModel):
-    """A named set of permissions a Membership can hold within a Tenant.
 
-    Design decision (ADR-003): Milestone 1 ships Role as a minimal lookup
-    table (fixed slug + display name), with NO Permission relation yet.
-    The full RBAC model (a Permission model, and OWN/TEAM/TENANT data
-    scopes per spec sections 6-7) is deliberately deferred to Milestone 6,
-    once the domain models permissions actually guard (Customer, Lead,
-    Deal, ...) exist — building the permission matrix before there's
-    anything to permission-check would be speculative and likely wrong.
-
-    The slug set below matches the roles finalized in spec section 49.
-    """
 
     class Slug(models.TextChoices):
         OWNER = "owner", "Owner"
@@ -120,16 +87,6 @@ class Role(TimeStampedModel):
 
 
 class Membership(TenantOwnedModel):
-    """Links a User to a Tenant with a Role — the core relationship RBAC
-    (spec section 6) is built on: User -> Membership -> Tenant -> Role.
-
-    A User may hold at most one Membership per Tenant. This is enforced at
-    the database level (UniqueConstraint below), not only in application
-    code, per spec section 22 ("prefer database constraints where the
-    database can guarantee a rule") — an application-level-only check has
-    a race condition under concurrent requests that a DB constraint does
-    not.
-    """
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
